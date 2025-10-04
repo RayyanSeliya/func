@@ -281,6 +281,24 @@ For more detailed deployment options, run 'func deploy --help'`)
 		return
 	}
 	if err = cfg.Validate(cmd); err != nil {
+		// Layer 2: Catch technical errors and provide CLI-specific user-friendly messages
+		if errors.Is(err, fn.ErrConflictingImageAndRegistry) {
+			return fmt.Errorf(`%w
+
+You cannot use both --image and --registry together when they specify different registries.
+
+These are two different ways to specify where to push your function image.
+
+Choose ONE of these approaches:
+
+1. Use --image to specify the complete image name:
+   func deploy --image <full-image-name>
+
+2. Use --registry and let the system create the image name automatically:
+   func deploy --registry <registry>
+
+For more options, run 'func deploy --help'`, err)
+		}
 		return
 	}
 	if f, err = cfg.Configure(f); err != nil { // Updates f with deploy cfg

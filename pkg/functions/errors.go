@@ -28,6 +28,9 @@ var (
 	// eg "registry required".  Then catch the error in the CLI and add the
 	// cli-specific usage hints there
 	ErrRegistryRequired = errors.New("registry required to build function, please set with `--registry` or the FUNC_REGISTRY environment variable")
+
+	// ErrConflictingImageAndRegistry is returned when both --image and --registry are provided with different registries
+	ErrConflictingImageAndRegistry = errors.New("conflicting image and registry options")
 )
 
 // ErrNotInitialized indicates that a function is uninitialized

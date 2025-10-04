@@ -162,6 +162,24 @@ func runBuild(cmd *cobra.Command, _ []string, newClient ClientFactory) (err erro
 		return
 	}
 	if err = cfg.Validate(); err != nil { // Perform any pre-validation
+		// Layer 2: Catch technical errors and provide CLI-specific user-friendly messages
+		if errors.Is(err, fn.ErrConflictingImageAndRegistry) {
+			return fmt.Errorf(`%w
+
+You cannot use both --image and --registry together when they specify different registries.
+
+These are two different ways to specify where to push your function image.
+
+Choose ONE of these approaches:
+
+1. Use --image to specify the complete image name:
+   func build --image <full-image-name>
+
+2. Use --registry and let the system create the image name automatically:
+   func build --registry <registry>
+
+For more options, run 'func build --help'`, err)
+		}
 		return
 	}
 	if f, err = fn.NewFunction(cfg.Path); err != nil { // Read in the Function
@@ -360,6 +378,17 @@ func (c buildConfig) Validate() (err error) {
 	// Builder value must refer to a known builder short name
 	if err = ValidateBuilder(c.Builder); err != nil {
 		return
+	}
+
+	// Check for conflicting --image and --registry
+	if c.Image != "" && c.Registry != "" {
+		// Check if image starts with the registry (allows subnamespaces)
+		// Example: --registry=example.com/alice --image=example.com/alice/subns/func is OK
+		// Example: --registry=example.com/alice --image=different.com/func is NOT OK
+		if !strings.HasPrefix(c.Image, c.Registry+"/") && !strings.HasPrefix(c.Image, c.Registry+":") {
+			// Image doesn't use the specified registry
+			return fn.ErrConflictingImageAndRegistry
+		}
 	}
 
 	// Platform is only supported with the S2I builder at this time
