@@ -34,6 +34,12 @@ var (
 
 	// ErrConflictingImageAndRegistry is returned when both --image and --registry flags are explicitly provided
 	ErrConflictingImageAndRegistry = errors.New("both --image and --registry flags provided")
+
+	// ErrInvalidKubeconfig is returned when the kubeconfig file path is invalid or inaccessible
+	ErrInvalidKubeconfig = errors.New("invalid kubeconfig")
+
+	// ErrClusterNotAccessible is returned when cluster connection fails (network, auth, etc)
+	ErrClusterNotAccessible = errors.New("cluster not accessible")
 )
 
 // ErrNotInitialized indicates that a function is uninitialized
