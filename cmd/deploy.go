@@ -375,10 +375,10 @@ Try this:
 
 For more options, run 'func deploy --help'`, fn.ErrInvalidKubeconfig, kubeconfigPath)
 		}
-		
+
 		if errors.Is(err, fn.ErrClusterNotAccessible) {
 			errMsg := err.Error()
-			
+
 			// Case 1: Empty/no cluster configuration in kubeconfig
 			if strings.Contains(errMsg, "no configuration has been provided") ||
 				strings.Contains(errMsg, "invalid configuration") {
@@ -394,7 +394,7 @@ Try this:
 
 For more options, run 'func deploy --help'`, fn.ErrClusterNotAccessible)
 			}
-			
+
 			// Case 2: Cluster is down, network issues, auth errors, etc
 			return fmt.Errorf(`%w
 
@@ -407,7 +407,7 @@ Try this:
 
 For more options, run 'func deploy --help'`, fn.ErrClusterNotAccessible)
 		}
-		
+
 		return err
 	}
 
