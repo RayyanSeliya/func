@@ -295,7 +295,7 @@ func validateClusterConnection() error {
 	restConfig, err := k8s.GetClientConfig().ClientConfig()
 	if err != nil {
 		kubeconfigPath := os.Getenv("KUBECONFIG")
-		
+
 		// Check if this is an empty/missing config error
 		if clientcmd.IsEmptyConfig(err) {
 			// If KUBECONFIG is explicitly set, check if the file exists
