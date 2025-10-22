@@ -34,6 +34,9 @@ var (
 
 	// ErrConflictingImageAndRegistry is returned when both --image and --registry flags are explicitly provided
 	ErrConflictingImageAndRegistry = errors.New("both --image and --registry flags provided")
+
+	// ErrInvalidNamespace is returned when a namespace name doesn't meet Kubernetes naming requirements
+	ErrInvalidNamespace = errors.New("invalid namespace")
 )
 
 // ErrNotInitialized indicates that a function is uninitialized

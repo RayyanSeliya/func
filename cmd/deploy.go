@@ -20,6 +20,7 @@ import (
 	"knative.dev/func/pkg/config"
 	fn "knative.dev/func/pkg/functions"
 	"knative.dev/func/pkg/k8s"
+	"knative.dev/func/pkg/utils"
 )
 
 func NewDeployCmd(newClient ClientFactory) *cobra.Command {
@@ -280,6 +281,20 @@ func runDeploy(cmd *cobra.Command, newClient ClientFactory) (err error) {
 	}
 	if err = cfg.Validate(cmd); err != nil {
 		// Layer 2: Catch technical errors and provide CLI-specific user-friendly messages
+		if errors.Is(err, fn.ErrInvalidNamespace) {
+			return fmt.Errorf(`%w
+
+Invalid namespace name. Kubernetes namespaces must:
+  - Contain only lowercase letters, numbers, and hyphens (-)
+  - Start and end with a letter or number
+  - Be 63 characters or less
+
+Valid examples:
+  func deploy --namespace myapp
+  func deploy --namespace my-app-123
+
+For more options, run 'func deploy --help'`, err)
+		}
 		if errors.Is(err, fn.ErrConflictingImageAndRegistry) {
 			return fmt.Errorf(`%w
 
@@ -736,6 +751,14 @@ func (c deployConfig) Validate(cmd *cobra.Command) (err error) {
 	// Bubble validation
 	if err = c.buildConfig.Validate(cmd); err != nil {
 		return
+	}
+
+	// Validate namespace format if provided
+	if c.Namespace != "" {
+		if err = utils.ValidateNamespace(c.Namespace); err != nil {
+			// Wrap the validation error as fn.ErrInvalidNamespace for layer consistency
+			return fn.ErrInvalidNamespace
+		}
 	}
 
 	// Check Image Digest was included
