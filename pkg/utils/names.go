@@ -113,8 +113,8 @@ func ValidateLabelValue(value string) error {
 func ValidateNamespace(namespace string) error {
 	if errs := validation.IsDNS1123Label(namespace); len(errs) > 0 {
 		// Reuse the error message from Kubernetes validation
-		// Replace "a DNS-1123 label" with more user-friendly context
-		errMsg := strings.Replace(strings.Join(errs, ""), "a DNS-1123 label", fmt.Sprintf("Namespace '%v'", namespace), 1)
+		// Replace "a lowercase RFC 1123 label" with more user-friendly context
+		errMsg := strings.Replace(strings.Join(errs, ""), "a lowercase RFC 1123 label", fmt.Sprintf("Namespace '%v'", namespace), 1)
 		return ErrInvalidNamespace(errors.New(errMsg))
 	}
 	return nil
